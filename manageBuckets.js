@@ -15,7 +15,7 @@ let bucketParams = {
 AWS.config.update(awsCredentials)
 const s3 = new AWS.S3(api_Version)
 
-async function  upload(){
+async function upload(){
     try {        
         s3.listBuckets((error, data) => {
             if(error) throw new Error(error)
@@ -48,16 +48,36 @@ async function  upload(){
 }
 
 function delete_(){
-    console.log('delete')
+    try {
+        let bucketToDelete = {
+            Bucket: uploadBucket
+        }
+        s3.deleteBucket(bucketToDelete, (error, data) => {
+            if(error) throw new Error(error)
+            console.log(data)
+
+            //if not empty, do something
+        })
+    } catch (error) {
+        console.log(error)        
+    }
 }
 
 function list_(){
-    console.log('list')
+    try {
+        s3.listBuckets((error, data) => {
+            if(error) throw new Error(error)
+            
+            console.log(data.Buckets)
+        })        
+    } catch (error) {
+        console.log(error)        
+    }
 }
 
 try {
     if(process.argv[2] === 'upload'){
-        if (process.argv.length < 5) 
+        if (process.argv.length < 4) 
             throw new Error('You must include Bucket name and file')  
     } else {
         if (process.argv.length < 4) 
@@ -66,8 +86,7 @@ try {
     switch(option){
         case 'upload':
             upload()
-            break
-            
+            break            
         case 'delete':
             delete_()
             break
@@ -81,4 +100,3 @@ try {
     console.log(error)    
     process.exit(true)
 }
-// bucket name meu-backup-na-aws
